@@ -1,3 +1,6 @@
 include <plates.scad>;
-
-front_plate();
+translate([0,0,face_z]){
+    rotate([180,0,0]){
+        front_plate();
+    }
+}
