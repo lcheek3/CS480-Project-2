@@ -1,13 +1,13 @@
 #include "SerialClass.h"
 #include <string>
 
-Serial::Serial(wchar_t* portName)
+Serial::Serial(char* portName)
 {
 	//We're not yet connected
 	this->connected = false;
 
 	//Try to connect to the given port throuh CreateFile
-	this->hSerial = CreateFile(portName,
+	this->hSerial = CreateFileA(static_cast<LPCSTR>(portName),
 		GENERIC_READ | GENERIC_WRITE,
 		0,
 		NULL,
