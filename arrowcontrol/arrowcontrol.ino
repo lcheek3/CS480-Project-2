@@ -29,21 +29,25 @@ void setup()
 void loop() 
 { 
   while(Serial.available() > 0){
-   // int ypos = Serial.parseInt();
-   // int xpos = Serial.parseInt();
-   char in = Serial.read();
+    int ypos = Serial.parseInt();
+    int xpos = Serial.parseInt();
+    y_servo.write(ypos);
+    x_servo.write(xpos);
+   /*char in = Serial.read();
     if (in == 'U'){
-      y_servo.write(y_servo.read()-1);
+      y_servo.write(y_servo.read()-5);
     }
-    else if (in == 'D'){
-      y_servo.write(y_servo.read()+1);
+    if (in == 'D'){
+      y_servo.write(y_servo.read()+5);
     }
-    else if (in == 'L'){
-      x_servo.write(x_servo.read()-1);
+    if (in == 'L'){
+      x_servo.write(x_servo.read()-5);
     }
-    else if (in == 'R'){
-      x_servo.write(x_servo.read()+1);
+    if (in == 'R'){
+      x_servo.write(x_servo.read()+5);
     }
+    */
   }
+  
 } 
 

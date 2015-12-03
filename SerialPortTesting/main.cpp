@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <vector>
 #include <conio.h>
+#include <chrono>
+#include <thread>
 
 #define KEY_UP 72
 #define KEY_DOWN 80
@@ -46,10 +48,12 @@ int main() {
 int main()
 {
 	printf("Welcome to the serial test app!\n\n");
-	Serial* SP = new Serial("\\\\.\\COM4");    // adjust as needed
+	Serial* SP = new Serial("\\\\.\\COM5");    // adjust as needed
 
 	if (SP->IsConnected())
 		printf("We're connected");
+	char test[5] = { '4','0','|','4', '0' };
+	char test2[5] = { '9','0','|','9', '0' };
 	char up[1] = { 'U' };
 	char down[1] = { 'D' };
 	char left[1] = { 'L' };
@@ -58,6 +62,11 @@ int main()
 	//printf("%s\n",incomingData);
 	//int dataLength = in.size();
 	//int readResult = 0;
+	if (SP->IsConnected())
+		SP->WriteData(test,5);
+	this_thread::sleep_for(chrono::seconds(5));
+	if (SP->IsConnected())
+		SP->WriteData(test2, 5);
 
 	while (SP->IsConnected())
 	{
