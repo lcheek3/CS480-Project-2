@@ -1,0 +1,16 @@
+//Laurin's README
+
+To use my code run the main.cpp. 
+
+Library Requirements: 
+	OPENGL
+	OPENCV
+	GLEW
+	GLUT
+
+Other Files to put in same file location: 
+	lib381 (Chappel's handy shader handling that is a pain)
+	main.cpp
+	MotionTracking.cpp
+	justTex_f.glsl
+	justTex_v.glsl
