@@ -48,7 +48,7 @@ int main() {
 int main()
 {
 	printf("Welcome to the serial test app!\n\n");
-	Serial* SP = new Serial("\\\\.\\COM5");    // adjust as needed
+	Serial* SP = new Serial("\\\\.\\COM3");    // adjust as needed
 
 	if (SP->IsConnected())
 		printf("We're connected");

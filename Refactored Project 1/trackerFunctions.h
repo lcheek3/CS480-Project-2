@@ -13,6 +13,17 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+std::vector<int> getCoordinates(cv::Point destination, std::map<std::string, int> configuration) {
+	int dist_cam_turr = 65; //in mm
+	int vertical_offset = 90 - atan2(configuration["PARALLAX"], dist_cam_turr);
+	int x_command = atan2((destination.x - configuration["CAM_RES_X"] / 2) , configuration["PARRALAX"])*180/CV_PI+90;
+	int y_command = atan2((destination.y - configuration["CAM_RES_Y"] / 2), configuration["PARRALAX"])*180/CV_PI+90 - vertical_offset;
+	std::vector<int> turr_coords;
+	turr_coords.push_back(x_command);
+	turr_coords.push_back(y_command);
+	return turr_coords;
+}
+
 //Replaces any missing configuration settings with default values
 bool configurationAutoReplace(std::map<std::string, int> configuration) {
 	bool unchanged = true;

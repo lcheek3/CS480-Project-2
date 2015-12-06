@@ -30,29 +30,35 @@ void loop()
 { 
   while(Serial.available() > 0){
     char command = Serial.read();
-    if (command == 'A'){
-      int ypos = Serial.parseInt();
-      int xpos = Serial.parseInt();
-      Serial.write(command);
-      y_servo.write(ypos);
-      x_servo.write(xpos);
+    if (command == '\n'){
+      Serial.write("saw a newline!");
     }
-    if (command == 'M'){
-      char in = Serial.parseInt();
-      Serial.write(in);
-      if (in == 1){
-       y_servo.write(y_servo.read()-5);
+    else{
+      if (command == 'A'){
+        int ypos = Serial.parseInt();
+        int xpos = Serial.parseInt();
+        Serial.write(command);
+        y_servo.write(ypos);
+        x_servo.write(xpos);
+        Serial.flush();
       }
-      if (in == 2){
-       y_servo.write(y_servo.read()+5);
+      if (command == 'M'){
+        char in = Serial.parseInt();
+        Serial.write(in);
+        if (in == 1){
+          y_servo.write(y_servo.read()-5);
+        }
+        if (in == 2){
+          y_servo.write(y_servo.read()+5);
+        }
+        if (in == 3){
+          x_servo.write(x_servo.read()-5);
+        }
+        if (in == 4){
+          x_servo.write(x_servo.read()+5);
+        }
+        Serial.flush();
       }
-      if (in == 3){
-       x_servo.write(x_servo.read()-5);
-      }
-      if (in == 4){
-        x_servo.write(x_servo.read()+5);
-      }
-    }
-  }  
-} 
-
+    }   
+  } 
+}
