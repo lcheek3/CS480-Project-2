@@ -1,11 +1,4 @@
-/* Sweep
- by BARRAGAN <http://barraganstudio.com> 
- This example code is in the public domain.
 
- modified 8 Nov 2013
- by Scott Fitzgerald
- http://www.arduino.cc/en/Tutorial/Sweep
-*/ 
 
 #include <Servo.h> 
  
@@ -30,20 +23,14 @@ void loop()
 { 
   while(Serial.available() > 0){
     char command = Serial.read();
-    if (command == '\n'){
-      Serial.write("saw a newline!");
-    }
-    else{
-      if (command == 'A'){
-        int ypos = Serial.parseInt();
-        int xpos = Serial.parseInt();
-        Serial.write(command);
-        y_servo.write(ypos);
-        x_servo.write(xpos);
-        Serial.flush();
-      }
-      if (command == 'M'){
-        char in = Serial.parseInt();
+     if (command == 'A'){
+        x_servo.write(Serial.parseInt());
+        y_servo.write(Serial.parseInt());
+        Serial.write(x_servo.read());
+        Serial.write(y_servo.read());
+     }
+     if (command == 'M'){
+        int in = Serial.parseInt();
         Serial.write(in);
         if (in == 1){
           y_servo.write(y_servo.read()-5);
@@ -57,8 +44,6 @@ void loop()
         if (in == 4){
           x_servo.write(x_servo.read()+5);
         }
-        Serial.flush();
       }
-    }   
-  } 
+    }    
 }

@@ -13,11 +13,15 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+//42mm 90mm
+//50 degrees cone of vision (25 degrees for half)
 std::vector<int> getCoordinates(cv::Point destination, std::map<std::string, int> configuration) {
+	double parallax_unit = (tan(0.43)*configuration["PARALLAX"]) / (configuration["CAM_RES_X"] / 2);
 	int dist_cam_turr = 65; //in mm
-	int vertical_offset = 90 - atan2(configuration["PARALLAX"], dist_cam_turr);
-	int x_command = atan2((destination.x - configuration["CAM_RES_X"] / 2) , configuration["PARRALAX"])*180/CV_PI+90;
-	int y_command = atan2((destination.y - configuration["CAM_RES_Y"] / 2), configuration["PARRALAX"])*180/CV_PI+90 - vertical_offset;
+	double vertical_offset = atan2(configuration["PARALLAX"], dist_cam_turr)*parallax_unit;
+	std::cout << vertical_offset << std::endl;
+	int x_command = -atan2((destination.x - configuration["CAM_RES_X"] / 2)*parallax_unit , configuration["PARALLAX"])*180/CV_PI+90;
+	int y_command = atan2((destination.y - configuration["CAM_RES_Y"] / 2)*parallax_unit , configuration["PARALLAX"])*180/CV_PI+90+vertical_offset;
 	std::vector<int> turr_coords;
 	turr_coords.push_back(x_command);
 	turr_coords.push_back(y_command);
@@ -59,6 +63,14 @@ bool configurationAutoReplace(std::map<std::string, int> configuration) {
 	}
 	if (!configuration["CAM_RES_Y"]) {
 		openFile << "CAM_RES_Y = 480\n";
+		unchanged = false;
+	}
+	if (!configuration["PARALLAX"]) {
+		openFile << "PARALLAX = 914\n"; //mm
+		unchanged = false;
+	}
+	if (!configuration["COM"]) {
+		openFile << "COM = 5\n";
 		unchanged = false;
 	}
 	return unchanged;
@@ -127,9 +139,9 @@ cv::Point pathSmoothing(cv::Mat &cameraFeed, std::vector<cv::Point> samplePoints
 void drawTarget(cv::Point target, cv::Mat &cameraFeed) {
 	int x = target.x;
 	int y = target.y;
-	cv::line(cameraFeed, cv::Point(x, y + 25), cv::Point(x, y - 25), cv::Scalar(0, 0, 0), 2);
-	line(cameraFeed, cv::Point(x + 25, y), cv::Point(x - 25, y), cv::Scalar(0, 0, 0), 2);
-	putText(cameraFeed, "(" + std::to_string(x) + "," + std::to_string(y) + ")", cv::Point(x - 38, y - 35), 1, 1, cv::Scalar(0, 0, 255), 2);
+	cv::line(cameraFeed, cv::Point(x, y + 25), cv::Point(x, y - 25), cv::Scalar(200, 255, 0), 2);
+	line(cameraFeed, cv::Point(x + 25, y), cv::Point(x - 25, y), cv::Scalar(200, 255, 0), 2);
+	putText(cameraFeed, "(" + std::to_string(x) + "," + std::to_string(y) + ")", cv::Point(x - 38, y - 35), 1, 1, cv::Scalar(255, 100, 0), 2);
 }
 
 //uses some trigonometry magic to update the position of the current point based on a limited speed given by SPEED_OF_MOVEMENT
@@ -180,10 +192,10 @@ void collectSamples(cv::Mat thresholdImage, cv::Mat &cameraFeed, std::vector<cv:
 			ypos += mass_centers[i].y;
 		}
 		//find the average of the centroids of all contours. This could be improved by using K-means or some other kind of clustering algorithm
-		if (!(abs(xpos) > configuration["CAM_RES_X"] || abs(ypos) > configuration["CAM_RES_Y"])) {
+		if (!(abs(xpos) > 10000 || abs(ypos) > 10000)) {
 			targ.x = xpos / contours.size(), targ.y = ypos / contours.size();
 		}
-		std::cout << targ << std::endl;
+		//std::cout << targ << std::endl;
 	}
 
 	samplePoints.push_back(targ);

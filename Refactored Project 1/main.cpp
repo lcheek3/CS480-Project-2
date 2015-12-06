@@ -21,8 +21,14 @@ https://dl.dropboxusercontent.com/u/28096936/tuts/motionTrackingTut/finalCode/mo
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <sstream>
 #include "trackerFunctions.h"
+#include "SerialClass.h"
 
+#define KEY_UP 72
+#define KEY_DOWN 80
+#define KEY_LEFT 75
+#define KEY_RIGHT 77
 
 int main() {
 	//object xy
@@ -65,13 +71,26 @@ int main() {
 	cv::Mat thresholdImage;
 	//video capture object.
 	//VideoCapture capture;
+	
 	cv::VideoCapture stream1(0);
 	if (!stream1.isOpened()) {
 		std::cout << "Cannot open camera." << std::endl;
 	}
+	std::stringstream comss;
+	comss << "\\\\.\\COM" << configuration["COM"];
+	char* comNum = _strdup((comss.str()).c_str());
+	Serial* turret = new Serial(comNum);    // adjust as needed
+
+	if (turret->IsConnected())
+		printf("Connection Success, ready for tracking.\n");
 
 	while (1) {
-
+		char incomingData[256] = "";
+		int dataLength = 255;
+		int readResult = 0;
+		readResult = turret->ReadData(incomingData, dataLength);
+		//printf("Bytes read: (0 means no data available) %i\n", readResult);
+		incomingData[readResult] = 0;
 		//read first frame
 		stream1.read(frame1);
 		//convert frame1 to gray scale for frame differencing
@@ -90,6 +109,7 @@ int main() {
 			imshow("Difference Image", differenceImage);
 			imshow("Threshold Image", thresholdImage);
 		}
+		//blacking out goes here
 		else {
 			//if not in debug mode, destroy the windows
 			cv::destroyWindow("Difference Image");
@@ -108,7 +128,6 @@ int main() {
 		else {
 			cv::destroyWindow("Final Threshold Image");
 		}
-
 		//if tracking enabled, search for contours in our thresholded image
 		if (trackingEnabled) {
 			//Collects a number of sample averages specified by SMOOTHING_SAMPLE and sticks them in the samplePoints global vector
@@ -119,21 +138,30 @@ int main() {
 			destination = pathSmoothing(frame1, samplePoints, configuration);
 			samplePoints.clear();
 		}
-
+		
 		if (trackingEnabled) {
-			drawTrails(frame1, current, targetPoints, configuration);
+			//drawTrails(frame1, current, targetPoints, configuration);
+			std::vector<int> coordinates = getCoordinates(destination, configuration);
+			std::stringstream coord_stream; 
+			coord_stream <<'A' << coordinates[0] << ' ' << coordinates[1] << '\n';
+			std::string turret_coordstr = coord_stream.str();
+			std::cout << turret_coordstr;
+			char* turret_coords = _strdup(turret_coordstr.c_str());
+			turret->WriteData(turret_coords, turret_coordstr.size());
+			free(turret_coords);
 		}
 
 
 		//limits the speed of movement of the target crosshair. We can tweak SPEED_OF_MOVEMENT to accurately reflect the actual position of the laser in project 2
 		//so that we can draw an obscuring circle over the laser
-		current = speedGovernor(current, destination, configuration["SPEED_OF_MOVEMENT"]);
-		cv::Point predictLine = speedGovernor(current, destination, 100);
+		current = destination;
+		//cv::Point predictLine = speedGovernor(current, destination, 100);
 
 		//draw the target
 		drawTarget(current, frame1);
-		line(frame1, current, predictLine, cv::Scalar(0, 255, 0), 2);
-
+		//line(frame1, current, predictLine, cv::Scalar(0, 255, 0), 2);
+		//line(frame1, cv::Point(configuration["CAM_RES_X"]/2 - 5, configuration["CAM_RES_Y"] / 2), cv::Point(configuration["CAM_RES_X"]/2 + 5, configuration["CAM_RES_Y"] / 2), cv::Scalar(0, 255, 0), 2);
+		//line(frame1, cv::Point(configuration["CAM_RES_X"] / 2, configuration["CAM_RES_Y"] / 2 - 5), cv::Point(configuration["CAM_RES_X"] / 2, configuration["CAM_RES_Y"] / 2 + 5), cv::Scalar(0, 255, 0), 2);
 		imshow("Frame1", frame1);
 
 		//hotkey code from tutorial at (https://dl.dropboxusercontent.com/u/28096936/tuts/motionTrackingTut/finalCode/motionTracking.cpp)
