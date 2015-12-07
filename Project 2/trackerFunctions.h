@@ -73,10 +73,6 @@ bool configurationAutoReplace(std::map<std::string, int> configuration) {
 		openFile << "COM = 5\n";
 		unchanged = false;
 	}
-	if (!configuration["CAMERA"]) {
-		openFile << "CAMERA = 0\n";
-		unchanged = false;
-	}
 	return unchanged;
 
 }

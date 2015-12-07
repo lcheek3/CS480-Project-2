@@ -80,6 +80,7 @@ int main() {
 	comss << "\\\\.\\COM" << configuration["COM"];
 	char* comNum = _strdup((comss.str()).c_str());
 	Serial* turret = new Serial(comNum);    // adjust as needed
+	free(comNum);
 
 	if (turret->IsConnected())
 		printf("Connection Success, ready for tracking.\n");
