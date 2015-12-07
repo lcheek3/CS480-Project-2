@@ -15,7 +15,7 @@ void setup()
   Serial.begin(9600);
   y_servo.attach(Y_PIN);  // attaches the servo on pin 9 to the servo object 
   x_servo.attach(X_PIN);
-  y_servo.write(90);
+  y_servo.write(170);
   x_servo.write(90);
 } 
  

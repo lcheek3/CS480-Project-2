@@ -18,7 +18,7 @@
 std::vector<int> getCoordinates(cv::Point destination, std::map<std::string, int> configuration) {
 	double parallax_unit = (tan(0.43)*configuration["PARALLAX"]) / (configuration["CAM_RES_X"] / 2);
 	int dist_cam_turr = 65; //in mm
-	double vertical_offset = atan2(dist_cam_turr,configuration["PARALLAX"])*parallax_unit;
+	double vertical_offset = (atan2(dist_cam_turr,configuration["PARALLAX"]))*180/CV_PI;
 	std::cout << vertical_offset << std::endl;
 	int x_command = -atan2((destination.x - configuration["CAM_RES_X"] / 2)*parallax_unit , configuration["PARALLAX"])*180/CV_PI+90;
 	int y_command = atan2((destination.y - configuration["CAM_RES_Y"] / 2)*parallax_unit , configuration["PARALLAX"])*180/CV_PI+90+vertical_offset;
